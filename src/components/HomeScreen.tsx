@@ -1,4 +1,6 @@
-import { Bus, TrainFront, Clock, Cloud, Sun, CloudRain } from "lucide-react";
+import { useState } from "react";
+import { Bus, TrainFront, Clock, Sun } from "lucide-react";
+import VehicleTrackingMap from "./VehicleTrackingMap";
 
 const busSchedule = [
   { route: "Bus 170", dest: "Johor Bahru → Kranji MRT", time: "07:15 AM", status: "On Time" },
@@ -13,19 +15,22 @@ const trainSchedule = [
 ];
 
 const HomeScreen = () => {
+  const [trackingKey, setTrackingKey] = useState<string | null>(null);
   const now = new Date();
   const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   const dateStr = now.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
 
+  if (trackingKey) {
+    return <VehicleTrackingMap vehicleKey={trackingKey} onClose={() => setTrackingKey(null)} />;
+  }
+
   return (
     <div className="space-y-5">
-      {/* Header */}
       <div className="bg-primary rounded-2xl p-5 text-primary-foreground">
         <h1 className="text-xl font-bold">Welcome to Community Hub 👋</h1>
         <p className="text-sm opacity-90 mt-1">Your guide to navigating daily life abroad.</p>
       </div>
 
-      {/* Time & Weather */}
       <div className="grid grid-cols-2 gap-3">
         <div className="glass-card rounded-xl p-4 flex items-center gap-3">
           <Clock className="w-8 h-8 text-primary shrink-0" />
@@ -43,7 +48,6 @@ const HomeScreen = () => {
         </div>
       </div>
 
-      {/* Bus Schedule */}
       <section>
         <div className="flex items-center gap-2 mb-3">
           <Bus className="w-5 h-5 text-primary" />
@@ -51,7 +55,11 @@ const HomeScreen = () => {
         </div>
         <div className="space-y-2">
           {busSchedule.map((b, i) => (
-            <div key={i} className="glass-card rounded-xl p-3.5 flex justify-between items-center">
+            <div
+              key={i}
+              onClick={() => setTrackingKey(b.route)}
+              className="glass-card rounded-xl p-3.5 flex justify-between items-center cursor-pointer hover:ring-2 hover:ring-primary/30 active:scale-[0.98] transition-all"
+            >
               <div>
                 <p className="font-semibold text-sm">{b.route}</p>
                 <p className="text-xs text-muted-foreground">{b.dest}</p>
@@ -67,7 +75,6 @@ const HomeScreen = () => {
         </div>
       </section>
 
-      {/* Train Schedule */}
       <section>
         <div className="flex items-center gap-2 mb-3">
           <TrainFront className="w-5 h-5 text-primary" />
@@ -75,7 +82,11 @@ const HomeScreen = () => {
         </div>
         <div className="space-y-2">
           {trainSchedule.map((t, i) => (
-            <div key={i} className="glass-card rounded-xl p-3.5 flex justify-between items-center">
+            <div
+              key={i}
+              onClick={() => setTrackingKey(t.line)}
+              className="glass-card rounded-xl p-3.5 flex justify-between items-center cursor-pointer hover:ring-2 hover:ring-primary/30 active:scale-[0.98] transition-all"
+            >
               <div>
                 <p className="font-semibold text-sm">{t.line}</p>
                 <p className="text-xs text-muted-foreground">{t.dest}</p>
