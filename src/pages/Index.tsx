@@ -1,16 +1,29 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import BottomNav, { type Screen } from "@/components/BottomNav";
+import HomeScreen from "@/components/HomeScreen";
+import TranslatorScreen from "@/components/TranslatorScreen";
+import CurrencyScreen from "@/components/CurrencyScreen";
+import DirectoryScreen from "@/components/DirectoryScreen";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const screens: Record<Screen, React.FC> = {
+  home: HomeScreen,
+  translator: TranslatorScreen,
+  currency: CurrencyScreen,
+  directory: DirectoryScreen,
+};
+
+const Index = () => {
+  const [active, setActive] = useState<Screen>("home");
+  const ActiveScreen = screens[active];
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <main className="max-w-lg mx-auto px-4 pt-4 safe-bottom">
+        <ActiveScreen />
+      </main>
+      <BottomNav active={active} onChange={setActive} />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
