@@ -91,10 +91,15 @@ const DirectoryScreen = () => {
               <Stars rating={p.rating} />
             </div>
             <p className="text-xs text-muted-foreground">{p.address} · {p.phone}</p>
-            <button className="flex items-center gap-1.5 text-xs font-medium text-primary">
+            <a
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.name + ", " + p.address)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-medium text-primary"
+            >
               <Navigation className="w-3.5 h-3.5" />
               Get Directions
-            </button>
+            </a>
           </div>
         ))}
       </div>
