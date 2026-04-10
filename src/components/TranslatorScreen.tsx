@@ -1,30 +1,35 @@
 import { useState } from "react";
-import { Copy, Check, ArrowDownUp } from "lucide-react";
+import { Copy, Check, ArrowDownUp, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-const languages = ["English", "Hindi", "Tamil", "Spanish", "Mandarin", "Malay", "Bengali", "Tagalog", "Thai"];
-
-const mockTranslations: Record<string, Record<string, Record<string, string>>> = {
-  English: {
-    Hindi: { "hello": "नमस्ते", "thank you": "धन्यवाद", "where is the bus stop?": "बस स्टॉप कहाँ है?", "how much does this cost?": "इसकी कीमत कितनी है?" },
-    Spanish: { "hello": "hola", "thank you": "gracias", "where is the bus stop?": "¿dónde está la parada de autobús?", "how much does this cost?": "¿cuánto cuesta esto?" },
-    Tamil: { "hello": "வணக்கம்", "thank you": "நன்றி", "where is the bus stop?": "பேருந்து நிறுத்தம் எங்கே?", "how much does this cost?": "இதன் விலை எவ்வளவு?" },
-    Mandarin: { "hello": "你好", "thank you": "谢谢", "where is the bus stop?": "公交车站在哪里？", "how much does this cost?": "这个多少钱？" },
-    Malay: { "hello": "hello", "thank you": "terima kasih", "where is the bus stop?": "di mana perhentian bas?", "how much does this cost?": "berapa harganya?" },
-  },
-};
+import { useI18n } from "@/lib/i18n";
+import { supabase } from "@/integrations/supabase/client";
+import { languages } from "@/lib/translations";
 
 const TranslatorScreen = () => {
+  const { t } = useI18n();
   const [fromLang, setFromLang] = useState("English");
   const [toLang, setToLang] = useState("Hindi");
   const [input, setInput] = useState("");
   const [output, setOutput] = useState("");
   const [copied, setCopied] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const translate = () => {
-    const key = input.trim().toLowerCase();
-    const result = mockTranslations[fromLang]?.[toLang]?.[key];
-    setOutput(result || `[Mock] Translated "${input}" from ${fromLang} to ${toLang}`);
+  const translate = async () => {
+    if (!input.trim()) return;
+    setLoading(true);
+    setOutput("");
+    try {
+      const { data, error } = await supabase.functions.invoke("translate", {
+        body: { text: input, fromLang, toLang },
+      });
+      if (error) throw error;
+      setOutput(data.translation || "Translation failed");
+    } catch (err) {
+      console.error("Translation error:", err);
+      setOutput("Translation failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const swap = () => {
@@ -42,9 +47,8 @@ const TranslatorScreen = () => {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-bold">Quick Translator</h1>
+      <h1 className="text-xl font-bold">{t("quickTranslator")}</h1>
 
-      {/* Language selectors */}
       <div className="flex items-center gap-2">
         <select
           value={fromLang}
@@ -65,19 +69,18 @@ const TranslatorScreen = () => {
         </select>
       </div>
 
-      {/* Input */}
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
-        placeholder="Type text to translate…"
+        placeholder={t("typePlaceholder")}
         className="w-full h-32 rounded-xl bg-card border border-border p-4 text-sm resize-none outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
       />
 
-      <Button onClick={translate} className="w-full rounded-xl h-11 font-semibold">
-        Translate
+      <Button onClick={translate} disabled={loading || !input.trim()} className="w-full rounded-xl h-11 font-semibold">
+        {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+        {t("translateBtn")}
       </Button>
 
-      {/* Output */}
       {output && (
         <div className="glass-card rounded-xl p-4 relative">
           <p className="text-sm leading-relaxed pr-8">{output}</p>
@@ -86,10 +89,6 @@ const TranslatorScreen = () => {
           </button>
         </div>
       )}
-
-      <p className="text-xs text-muted-foreground text-center">
-        Try: "hello", "thank you", "where is the bus stop?", "how much does this cost?"
-      </p>
     </div>
   );
 };
