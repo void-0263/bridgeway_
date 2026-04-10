@@ -4,6 +4,7 @@ import HomeScreen from "@/components/HomeScreen";
 import TranslatorScreen from "@/components/TranslatorScreen";
 import CurrencyScreen from "@/components/CurrencyScreen";
 import DirectoryScreen from "@/components/DirectoryScreen";
+import MessagesScreen from "@/components/MessagesScreen";
 import { I18nProvider } from "@/lib/i18n";
 
 const screens: Record<Screen, React.FC> = {
@@ -11,6 +12,7 @@ const screens: Record<Screen, React.FC> = {
   translator: TranslatorScreen,
   currency: CurrencyScreen,
   directory: DirectoryScreen,
+  messages: MessagesScreen,
 };
 
 const Index = () => {
