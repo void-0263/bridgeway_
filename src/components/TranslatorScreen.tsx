@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Copy, Check, ArrowDownUp, Loader2 } from "lucide-react";
+import { Copy, Check, ArrowDownUp, Loader2, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,46 +46,59 @@ const TranslatorScreen = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-bold">{t("quickTranslator")}</h1>
+    <div className="space-y-5 pb-24">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center">
+          <Languages className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <div>
+          <h1 className="text-lg font-bold">{t("quickTranslator")}</h1>
+          <p className="text-xs text-muted-foreground">Powered by AI • Instant results</p>
+        </div>
+      </div>
 
+      {/* Language selectors */}
       <div className="flex items-center gap-2">
         <select
           value={fromLang}
           onChange={(e) => setFromLang(e.target.value)}
-          className="flex-1 rounded-xl bg-secondary text-secondary-foreground px-3 py-2.5 text-sm font-medium border-0 outline-none focus:ring-2 focus:ring-ring"
+          className="flex-1 rounded-xl bg-card text-foreground px-3 py-3 text-sm font-medium border border-border outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary shadow-sm"
         >
           {languages.map((l) => <option key={l}>{l}</option>)}
         </select>
-        <button onClick={swap} className="p-2 rounded-full bg-primary/10 text-primary">
+        <button onClick={swap} className="p-2.5 rounded-xl bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
           <ArrowDownUp className="w-4 h-4" />
         </button>
         <select
           value={toLang}
           onChange={(e) => setToLang(e.target.value)}
-          className="flex-1 rounded-xl bg-secondary text-secondary-foreground px-3 py-2.5 text-sm font-medium border-0 outline-none focus:ring-2 focus:ring-ring"
+          className="flex-1 rounded-xl bg-card text-foreground px-3 py-3 text-sm font-medium border border-border outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary shadow-sm"
         >
           {languages.map((l) => <option key={l}>{l}</option>)}
         </select>
       </div>
 
+      {/* Input */}
       <textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}
         placeholder={t("typePlaceholder")}
-        className="w-full h-32 rounded-xl bg-card border border-border p-4 text-sm resize-none outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
+        className="w-full h-36 rounded-xl bg-card border border-border p-4 text-sm resize-none outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary placeholder:text-muted-foreground shadow-sm"
       />
 
-      <Button onClick={translate} disabled={loading || !input.trim()} className="w-full rounded-xl h-11 font-semibold">
+      {/* Translate button */}
+      <Button onClick={translate} disabled={loading || !input.trim()} className="w-full rounded-xl h-12 font-bold text-sm shadow-md">
         {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
         {t("translateBtn")}
       </Button>
 
+      {/* Output */}
       {output && (
         <div className="glass-card rounded-xl p-4 relative">
-          <p className="text-sm leading-relaxed pr-8">{output}</p>
-          <button onClick={copy} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground transition-colors">
-            {copied ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4" />}
+          <p className="text-sm leading-relaxed pr-8 text-foreground">{output}</p>
+          <button onClick={copy} className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+            {copied ? <Check className="w-4 h-4 text-accent" /> : <Copy className="w-4 h-4" />}
           </button>
         </div>
       )}
