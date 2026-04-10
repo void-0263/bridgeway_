@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bus, TrainFront, Clock, Sun, Search, Calendar, Globe, ChevronDown, ExternalLink } from "lucide-react";
+import { Bus, TrainFront, Clock, Sun, Search, Globe, ChevronDown, ExternalLink, MapPin } from "lucide-react";
 import VehicleTrackingMap from "./VehicleTrackingMap";
 import WeatherForecast from "./WeatherForecast";
 import { useI18n } from "@/lib/i18n";
@@ -7,51 +7,7 @@ import { languages, type Lang } from "@/lib/translations";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar as CalendarComponent } from "@/components/ui/calendar";
-
-interface TransitEntry {
-  id: string;
-  route: string;
-  dest: string;
-  time: string;
-  status: string;
-  type: "bus" | "train";
-  stops: string[];
-  frequency?: string;
-}
-
-// Rich Singapore transit data
-const allTransit: TransitEntry[] = [
-  // Buses
-  { id: "bus-170", route: "Bus 170", dest: "Johor Bahru ↔ Kranji MRT", time: "07:15", status: "on-time", type: "bus", stops: ["Johor Bahru CIQ", "Woodlands Checkpoint", "Woodlands Centre", "Marsiling MRT", "Kranji MRT"] },
-  { id: "bus-858", route: "Bus 858", dest: "Yishun ↔ Woodlands", time: "07:30", status: "delayed", type: "bus", stops: ["Yishun Int", "Yishun Ring Rd", "Sembawang", "Admiralty", "Woodlands Int"] },
-  { id: "bus-67", route: "Bus 67", dest: "Tampines ↔ Choa Chu Kang", time: "08:00", status: "on-time", type: "bus", stops: ["Tampines Int", "Bedok North", "Bishan", "Bukit Panjang", "Choa Chu Kang"] },
-  { id: "bus-36", route: "Bus 36", dest: "Changi Airport ↔ Tomlinson Rd", time: "06:45", status: "on-time", type: "bus", stops: ["Changi Airport T3", "Tanah Merah", "Geylang", "Orchard", "Tomlinson Rd"] },
-  { id: "bus-51", route: "Bus 51", dest: "Hougang ↔ Jurong East", time: "07:00", status: "on-time", type: "bus", stops: ["Hougang Central", "Serangoon", "Toa Payoh", "Bukit Timah", "Jurong East"] },
-  { id: "bus-143", route: "Bus 143", dest: "Toa Payoh ↔ Punggol", time: "07:45", status: "delayed", type: "bus", stops: ["Toa Payoh Int", "Braddell", "Ang Mo Kio", "Sengkang", "Punggol"] },
-  { id: "bus-12", route: "Bus 12", dest: "Pasir Ris ↔ Kampong Bahru", time: "08:15", status: "on-time", type: "bus", stops: ["Pasir Ris Int", "Tampines", "Bedok", "Katong", "Kampong Bahru"] },
-  { id: "bus-190", route: "Bus 190", dest: "Choa Chu Kang ↔ Kampong Bahru", time: "06:30", status: "on-time", type: "bus", stops: ["Choa Chu Kang", "Bukit Batok", "Clementi", "Queenstown", "Kampong Bahru"] },
-  // MRT
-  { id: "nsl", route: "North-South Line", dest: "Jurong East ↔ Marina South Pier", time: "07:10", status: "on-time", type: "train", frequency: "4", stops: ["Jurong East", "Bukit Batok", "Bishan", "Orchard", "City Hall", "Marina Bay", "Marina South Pier"] },
-  { id: "ewl", route: "East-West Line", dest: "Pasir Ris ↔ Tuas Link", time: "07:12", status: "on-time", type: "train", frequency: "5", stops: ["Pasir Ris", "Tampines", "Paya Lebar", "Bugis", "City Hall", "Jurong East", "Tuas Link"] },
-  { id: "dtl", route: "Downtown Line", dest: "Bukit Panjang ↔ Expo", time: "07:08", status: "on-time", type: "train", frequency: "3", stops: ["Bukit Panjang", "Beauty World", "Botanic Gardens", "Downtown", "Bayfront", "Expo"] },
-  { id: "ccl", route: "Circle Line", dest: "Dhoby Ghaut ↔ HarbourFront", time: "07:05", status: "on-time", type: "train", frequency: "4", stops: ["Dhoby Ghaut", "Bras Basah", "Paya Lebar", "MacPherson", "Bishan", "Botanic Gardens", "HarbourFront"] },
-  { id: "nel", route: "North-East Line", dest: "HarbourFront ↔ Punggol", time: "07:06", status: "on-time", type: "train", frequency: "5", stops: ["HarbourFront", "Outram Park", "Dhoby Ghaut", "Little India", "Serangoon", "Sengkang", "Punggol"] },
-  { id: "tel", route: "Thomson-East Coast Line", dest: "Woodlands North ↔ Bayshore", time: "07:15", status: "on-time", type: "train", frequency: "5", stops: ["Woodlands North", "Woodlands", "Caldecott", "Stevens", "Orchard", "Marina Bay", "Bayshore"] },
-];
-
-// Generate schedule times for a given base time
-const generateTimes = (baseTime: string, count: number): string[] => {
-  const [h, m] = baseTime.split(":").map(Number);
-  const times: string[] = [];
-  for (let i = 0; i < count; i++) {
-    const newM = m + i * 15;
-    const totalMinutes = h * 60 + newM;
-    const hh = Math.floor(totalMinutes / 60) % 24;
-    const mm = totalMinutes % 60;
-    times.push(`${String(hh).padStart(2, "0")}:${String(mm).padStart(2, "0")}`);
-  }
-  return times;
-};
+import { allTransit, countries, type TransitEntry } from "@/data/destinations";
 
 const formatTime12h = (time24: string): string => {
   const [h, m] = time24.split(":").map(Number);
@@ -70,8 +26,8 @@ const HomeScreen = () => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [currentTemp, setCurrentTemp] = useState<number | null>(null);
   const [currentWeatherCode, setCurrentWeatherCode] = useState<number>(2);
+  const [selectedCountry, setSelectedCountry] = useState("singapore");
 
-  // Fetch current weather
   useEffect(() => {
     const fetchCurrentWeather = async () => {
       try {
@@ -93,16 +49,17 @@ const HomeScreen = () => {
   const timeStr = selectedDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
   const dateStr = selectedDate.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" });
 
-  // Filter transit by search
+  // Filter by country first, then by search
+  const countryTransit = allTransit.filter((t) => t.country === selectedCountry);
   const searchLower = search.toLowerCase();
   const filteredTransit = search.trim()
-    ? allTransit.filter(
+    ? countryTransit.filter(
         (t) =>
           t.route.toLowerCase().includes(searchLower) ||
           t.dest.toLowerCase().includes(searchLower) ||
           t.stops.some((s) => s.toLowerCase().includes(searchLower))
       )
-    : allTransit;
+    : countryTransit;
 
   const buses = filteredTransit.filter((t) => t.type === "bus");
   const trains = filteredTransit.filter((t) => t.type === "train");
@@ -110,8 +67,8 @@ const HomeScreen = () => {
   const openInGoogleMaps = (entry: TransitEntry) => {
     const origin = entry.stops[0];
     const destination = entry.stops[entry.stops.length - 1];
-    const mode = entry.type === "bus" ? "transit" : "transit";
-    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin + ", Singapore")}&destination=${encodeURIComponent(destination + ", Singapore")}&travelmode=${mode}`;
+    const suffix = entry.mapCountry;
+    const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin + ", " + suffix)}&destination=${encodeURIComponent(destination + ", " + suffix)}&travelmode=transit`;
     window.open(url, "_blank");
   };
 
@@ -126,8 +83,8 @@ const HomeScreen = () => {
   const weatherDesc = currentWeatherCode <= 1 ? "☀️" : currentWeatherCode <= 3 ? "⛅" : "🌧️";
 
   return (
-    <div className="space-y-5">
-      {/* Header with language selector */}
+    <div className="space-y-4 pb-24">
+      {/* Header */}
       <div className="bg-primary rounded-2xl p-5 text-primary-foreground relative">
         <div className="flex justify-between items-start">
           <div>
@@ -144,7 +101,7 @@ const HomeScreen = () => {
           </button>
         </div>
         {showLangMenu && (
-          <div className="absolute right-4 top-16 z-30 bg-card text-card-foreground rounded-xl shadow-lg border border-border p-2 min-w-[160px]">
+          <div className="absolute right-4 top-16 z-30 bg-card text-card-foreground rounded-xl shadow-lg border border-border p-2 min-w-[160px] max-h-[300px] overflow-y-auto">
             {languages.map((l) => (
               <button
                 key={l}
@@ -160,6 +117,23 @@ const HomeScreen = () => {
         )}
       </div>
 
+      {/* Country Selector */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+        {countries.map((c) => (
+          <button
+            key={c.id}
+            onClick={() => setSelectedCountry(c.id)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors border ${
+              selectedCountry === c.id
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border text-foreground hover:bg-muted"
+            }`}
+          >
+            {c.label}
+          </button>
+        ))}
+      </div>
+
       {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -171,7 +145,7 @@ const HomeScreen = () => {
         />
       </div>
 
-      {/* Time/Weather widgets */}
+      {/* Time/Weather */}
       <div className="grid grid-cols-2 gap-3">
         <Popover open={showDatePicker} onOpenChange={setShowDatePicker}>
           <PopoverTrigger asChild>
@@ -193,10 +167,7 @@ const HomeScreen = () => {
           </PopoverContent>
         </Popover>
 
-        <button
-          onClick={() => setShowWeather(true)}
-          className="glass-card rounded-xl p-4 flex items-center gap-3 text-left"
-        >
+        <button onClick={() => setShowWeather(true)} className="glass-card rounded-xl p-4 flex items-center gap-3 text-left">
           <Sun className="w-8 h-8 text-warning shrink-0" />
           <div>
             <p className="text-lg font-bold">{currentTemp !== null ? `${currentTemp}°C` : "..."} {weatherDesc}</p>
@@ -227,24 +198,12 @@ const HomeScreen = () => {
                     </p>
                   </div>
                 </div>
-                <p className="text-[10px] text-muted-foreground truncate">
-                  {b.stops.join(" → ")}
-                </p>
+                <p className="text-[10px] text-muted-foreground truncate">{b.stops.join(" → ")}</p>
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 h-8 text-xs rounded-lg"
-                    onClick={() => setTrackingKey(b.route)}
-                  >
+                  <Button size="sm" variant="outline" className="flex-1 h-8 text-xs rounded-lg" onClick={() => setTrackingKey(b.route)}>
                     {t("trackLive")}
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 text-xs rounded-lg gap-1"
-                    onClick={() => openInGoogleMaps(b)}
-                  >
+                  <Button size="sm" variant="ghost" className="h-8 text-xs rounded-lg gap-1" onClick={() => openInGoogleMaps(b)}>
                     <ExternalLink className="w-3 h-3" />
                     Maps
                   </Button>
@@ -255,7 +214,7 @@ const HomeScreen = () => {
         </section>
       )}
 
-      {/* MRT Schedule */}
+      {/* Train/Metro Schedule */}
       {trains.length > 0 && (
         <section>
           <div className="flex items-center gap-2 mb-3">
@@ -275,24 +234,12 @@ const HomeScreen = () => {
                     <p className="text-xs text-muted-foreground">{t("every")} {tr.frequency} {t("min")}</p>
                   </div>
                 </div>
-                <p className="text-[10px] text-muted-foreground truncate">
-                  {tr.stops.join(" → ")}
-                </p>
+                <p className="text-[10px] text-muted-foreground truncate">{tr.stops.join(" → ")}</p>
                 <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 h-8 text-xs rounded-lg"
-                    onClick={() => setTrackingKey(tr.route)}
-                  >
+                  <Button size="sm" variant="outline" className="flex-1 h-8 text-xs rounded-lg" onClick={() => setTrackingKey(tr.route)}>
                     {t("trackLive")}
                   </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="h-8 text-xs rounded-lg gap-1"
-                    onClick={() => openInGoogleMaps(tr)}
-                  >
+                  <Button size="sm" variant="ghost" className="h-8 text-xs rounded-lg gap-1" onClick={() => openInGoogleMaps(tr)}>
                     <ExternalLink className="w-3 h-3" />
                     Maps
                   </Button>
