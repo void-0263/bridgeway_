@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Star, Navigation } from "lucide-react";
+import { Search, Star, Navigation, MapPin } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 interface Place {
@@ -28,9 +28,9 @@ const categories = ["All", "Indian Restaurants", "Supermarkets", "Clinics", "Emb
 const Stars = ({ rating }: { rating: number }) => (
   <div className="flex items-center gap-0.5">
     {[1, 2, 3, 4, 5].map((s) => (
-      <Star key={s} className={`w-3.5 h-3.5 ${s <= Math.round(rating) ? "fill-warning text-warning" : "text-muted"}`} />
+      <Star key={s} className={`w-3 h-3 ${s <= Math.round(rating) ? "fill-warning text-warning" : "text-muted"}`} />
     ))}
-    <span className="text-xs text-muted-foreground ml-1">{rating}</span>
+    <span className="text-[11px] text-muted-foreground ml-1 font-medium">{rating}</span>
   </div>
 );
 
@@ -47,28 +47,39 @@ const DirectoryScreen = () => {
   });
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-xl font-bold">{t("localDirectory")}</h1>
+    <div className="space-y-4 pb-24">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-warning to-warning/70 flex items-center justify-center">
+          <MapPin className="w-5 h-5 text-warning-foreground" />
+        </div>
+        <div>
+          <h1 className="text-lg font-bold">{t("localDirectory")}</h1>
+          <p className="text-xs text-muted-foreground">Restaurants, clinics, embassies & more</p>
+        </div>
+      </div>
 
+      {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder={t("searchPlaces")}
-          className="w-full rounded-xl bg-card border border-border pl-10 pr-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-ring placeholder:text-muted-foreground"
+          className="w-full rounded-xl bg-card border border-border pl-10 pr-4 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary placeholder:text-muted-foreground shadow-sm"
         />
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 no-scrollbar">
+      {/* Category pills */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
         {categories.map((c) => (
           <button
             key={c}
             onClick={() => setCategory(c)}
-            className={`shrink-0 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`shrink-0 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all border shadow-sm ${
               category === c
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground"
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-card border-border text-foreground hover:bg-muted"
             }`}
           >
             {c === "All" ? t("all") : c}
@@ -76,25 +87,29 @@ const DirectoryScreen = () => {
         ))}
       </div>
 
+      {/* Places */}
       <div className="space-y-2.5">
         {filtered.length === 0 && (
-          <p className="text-sm text-muted-foreground text-center py-8">No places found.</p>
+          <div className="text-center py-12">
+            <MapPin className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">No places found.</p>
+          </div>
         )}
         {filtered.map((p, i) => (
           <div key={i} className="glass-card rounded-xl p-4 space-y-2">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold text-sm">{p.name}</h3>
-                <p className="text-xs text-muted-foreground">{p.category}</p>
+                <h3 className="font-bold text-sm">{p.name}</h3>
+                <p className="text-[11px] text-muted-foreground mt-0.5">{p.category}</p>
               </div>
               <Stars rating={p.rating} />
             </div>
             <p className="text-xs text-muted-foreground">{p.address} · {p.phone}</p>
             <a
-              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.name + ", " + p.address)}`}
+              href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.name + ", " + p.address + ", Singapore")}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs font-medium text-primary"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
             >
               <Navigation className="w-3.5 h-3.5" />
               {t("getDirections")}
