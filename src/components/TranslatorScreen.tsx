@@ -5,8 +5,6 @@ import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { languages } from "@/lib/translations";
 import AnimatedPage from "./AnimatedPage";
-import { supabase } from "@/integrations/supabase/client";
-import { languages } from "@/lib/translations";
 
 const TranslatorScreen = () => {
   const { t } = useI18n();
