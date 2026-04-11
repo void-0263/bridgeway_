@@ -36,6 +36,8 @@ type TranslationKeys = {
   trackLive: string;
   partlyCloudy: string;
   selectDate: string;
+  forum: string;
+  guide: string;
 };
 
 export const translations: Record<Lang, TranslationKeys> = {
@@ -73,6 +75,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "Track Live",
     partlyCloudy: "Partly Cloudy",
     selectDate: "Select Date & Time",
+    forum: "Forum",
+    guide: "Guide",
   },
   Hindi: {
     welcome: "आपका ग्लोबल साथी 🌍",
@@ -108,6 +112,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "लाइव ट्रैक",
     partlyCloudy: "आंशिक बादल",
     selectDate: "तारीख और समय चुनें",
+    forum: "फोरम",
+    guide: "गाइड",
   },
   Tamil: {
     welcome: "உங்கள் உலகளாவிய துணை 🌍",
@@ -143,6 +149,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "நேரடி கண்காணிப்பு",
     partlyCloudy: "ஓரளவு மேகமூட்டம்",
     selectDate: "தேதி & நேரம் தேர்வு",
+    forum: "மன்றம்",
+    guide: "வழிகாட்டி",
   },
   Spanish: {
     welcome: "Tu Compañero Global 🌍",
@@ -178,6 +186,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "Rastreo en vivo",
     partlyCloudy: "Parcialmente nublado",
     selectDate: "Seleccionar fecha y hora",
+    forum: "Foro",
+    guide: "Guía",
   },
   Mandarin: {
     welcome: "您的全球伴侣 🌍",
@@ -213,6 +223,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "实时跟踪",
     partlyCloudy: "多云",
     selectDate: "选择日期和时间",
+    forum: "论坛",
+    guide: "指南",
   },
   Malay: {
     welcome: "Teman Global Anda 🌍",
@@ -248,6 +260,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "Jejak Langsung",
     partlyCloudy: "Separa Berawan",
     selectDate: "Pilih Tarikh & Masa",
+    forum: "Forum",
+    guide: "Panduan",
   },
   Bengali: {
     welcome: "আপনার গ্লোবাল সঙ্গী 🌍",
@@ -283,6 +297,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "লাইভ ট্র্যাক",
     partlyCloudy: "আংশিক মেঘলা",
     selectDate: "তারিখ ও সময় নির্বাচন",
+    forum: "ফোরাম",
+    guide: "গাইড",
   },
   Tagalog: {
     welcome: "Ang Iyong Global na Kasama 🌍",
@@ -318,6 +334,8 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "Live Track",
     partlyCloudy: "Bahagyang Maulap",
     selectDate: "Pumili ng Petsa at Oras",
+    forum: "Forum",
+    guide: "Gabay",
   },
   Thai: {
     welcome: "เพื่อนคู่ใจทั่วโลก 🌍",
@@ -353,5 +371,7 @@ export const translations: Record<Lang, TranslationKeys> = {
     trackLive: "ติดตามสด",
     partlyCloudy: "มีเมฆบางส่วน",
     selectDate: "เลือกวันที่และเวลา",
+    forum: "ฟอรั่ม",
+    guide: "คู่มือ",
   },
 };

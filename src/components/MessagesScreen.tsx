@@ -3,6 +3,7 @@ import { Bell, AlertTriangle, Info, Shield, Plane, DollarSign, Cloud, Loader2, R
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useI18n } from "@/lib/i18n";
+import AnimatedPage from "./AnimatedPage";
 
 interface Announcement {
   title: string;
@@ -65,6 +66,7 @@ const MessagesScreen = () => {
   }, [selectedCountry]);
 
   return (
+    <AnimatedPage>
     <div className="space-y-4 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -162,6 +164,7 @@ const MessagesScreen = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 
