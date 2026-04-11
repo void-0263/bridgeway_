@@ -103,7 +103,7 @@
     padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem);
   }
   .glass-card {
-    @apply bg-card border border-border/60 shadow-sm hover:shadow-md transition-shadow;
+    @apply bg-card/70 backdrop-blur-xl border border-border/40 shadow-sm;
   }
   .scrollbar-hide {
     -ms-overflow-style: none;
