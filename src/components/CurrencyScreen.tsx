@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ArrowDownUp, Loader2, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import AnimatedPage from "./AnimatedPage";
 
 const currencies = ["USD", "EUR", "INR", "SGD", "GBP", "MYR", "AED", "BDT", "PHP", "THB", "JPY", "CNY"];
 
@@ -37,6 +38,7 @@ const CurrencyScreen = () => {
   const swap = () => { setFrom(to); setTo(from); setResult(null); setRate(null); };
 
   return (
+    <AnimatedPage>
     <div className="space-y-5 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -99,6 +101,7 @@ const CurrencyScreen = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 

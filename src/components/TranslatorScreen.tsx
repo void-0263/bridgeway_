@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { supabase } from "@/integrations/supabase/client";
 import { languages } from "@/lib/translations";
+import AnimatedPage from "./AnimatedPage";
+import { supabase } from "@/integrations/supabase/client";
+import { languages } from "@/lib/translations";
 
 const TranslatorScreen = () => {
   const { t } = useI18n();
@@ -46,6 +49,7 @@ const TranslatorScreen = () => {
   };
 
   return (
+    <AnimatedPage>
     <div className="space-y-5 pb-24">
       {/* Header */}
       <div className="flex items-center gap-3">
@@ -103,6 +107,7 @@ const TranslatorScreen = () => {
         </div>
       )}
     </div>
+    </AnimatedPage>
   );
 };
 
