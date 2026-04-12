@@ -86,7 +86,7 @@ const HomeScreen = () => {
     <AnimatedPage>
       <div className="space-y-5 pb-24">
         {/* Hero Header */}
-        <div className="relative bg-gradient-to-br from-primary via-primary/90 to-accent/70 rounded-3xl p-6 text-primary-foreground overflow-hidden shadow-2xl">
+        <div className="relative bg-gradient-to-br from-primary via-primary/90 to-accent/70 rounded-3xl p-6 text-primary-foreground shadow-2xl">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
           <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-xl" />
           <div className="relative z-10 flex justify-between items-start">
