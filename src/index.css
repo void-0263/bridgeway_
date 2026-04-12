@@ -103,7 +103,10 @@
     padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom, 0px) + 0.5rem);
   }
   .glass-card {
-    @apply bg-card/70 backdrop-blur-xl border border-border/40 shadow-sm;
+    @apply bg-card/60 backdrop-blur-2xl border border-border/30 shadow-lg;
+  }
+  .glass-card-hover {
+    @apply glass-card transition-all duration-300 hover:shadow-xl hover:border-border/50 hover:-translate-y-0.5;
   }
   .scrollbar-hide {
     -ms-overflow-style: none;
@@ -111,5 +114,8 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
   }
 }

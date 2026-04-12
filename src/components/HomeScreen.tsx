@@ -109,7 +109,7 @@ const HomeScreen = () => {
           </div>
 
           {showLangMenu && (
-            <div className="absolute right-4 top-[80px] z-30 bg-card text-card-foreground rounded-2xl shadow-2xl border border-border p-2 min-w-[170px] max-h-[280px] overflow-y-auto">
+            <div className="absolute right-4 top-[80px] z-[60] bg-card text-card-foreground rounded-2xl shadow-2xl border border-border p-2 min-w-[170px] max-h-[280px] overflow-y-auto">
               {languages.map((l) => (
                 <button
                   key={l}
