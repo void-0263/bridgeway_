@@ -7,6 +7,7 @@ export type Screen = "home" | "translator" | "currency" | "forum" | "guide" | "m
 const tabConfig: { id: Screen; labelKey: string; icon: typeof Home }[] = [
   { id: "home", labelKey: "home", icon: Home },
   { id: "forum", labelKey: "forum", icon: MessageSquare },
+  { id: "currency", labelKey: "currency", icon: DollarSign },
   { id: "guide", labelKey: "guide", icon: BookOpen },
   { id: "translator", labelKey: "translate", icon: Languages },
   { id: "messages", labelKey: "messages", icon: Bell },
