@@ -74,10 +74,10 @@ Millions of workers across the globe operate in fragmented environments—differ
 
 Immigrant workers often face:
 
-* Language barriers 🗣️
-* Lack of reliable information 📉
-* Social isolation 😔
-* Difficulty navigating foreign systems 🌍
+* Language barriers 
+* Lack of reliable information 
+* Social isolation 
+* Difficulty navigating foreign systems 
 
 **Bridgeway addresses these challenges by integrating essential tools into one unified platform.**
 
