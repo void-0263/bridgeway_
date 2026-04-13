@@ -31,7 +31,7 @@ const HomeScreen = () => {
   const [currentTemp, setCurrentTemp] = useState<number | null>(null);
   const [currentWeatherCode, setCurrentWeatherCode] = useState<number>(2);
 
-  const { meta } = useCountry();
+  
 
   useEffect(() => {
     const fetchCurrentWeather = async () => {
