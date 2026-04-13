@@ -21,7 +21,7 @@ const formatTime12h = (time24: string): string => {
 
 const HomeScreen = () => {
   const { t, lang, setLang } = useI18n();
-  const { country, setCountry, countryLabel } = useCountry();
+  const { country, setCountry, countryLabel, meta } = useCountry();
   const [trackingKey, setTrackingKey] = useState<string | null>(null);
   const [showWeather, setShowWeather] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
