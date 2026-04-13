@@ -40,6 +40,7 @@ interface Props {
 }
 
 const WeatherForecast = ({ onClose }: Props) => {
+  const { t } = useI18n();
   const { meta } = useCountry();
   const [days, setDays] = useState<DayWeather[]>([]);
   const [loading, setLoading] = useState(true);
