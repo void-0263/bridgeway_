@@ -31,11 +31,13 @@ const HomeScreen = () => {
   const [currentTemp, setCurrentTemp] = useState<number | null>(null);
   const [currentWeatherCode, setCurrentWeatherCode] = useState<number>(2);
 
+  const { meta } = useCountry();
+
   useEffect(() => {
     const fetchCurrentWeather = async () => {
       try {
         const res = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=1.3521&longitude=103.8198&current=temperature_2m,weather_code&timezone=Asia/Singapore"
+          `https://api.open-meteo.com/v1/forecast?latitude=${meta.lat}&longitude=${meta.lon}&current=temperature_2m,weather_code&timezone=${encodeURIComponent(meta.timezone)}`
         );
         const data = await res.json();
         if (data.current) {
@@ -47,10 +49,17 @@ const HomeScreen = () => {
       }
     };
     fetchCurrentWeather();
+  }, [meta]);
+
+  // Country-specific live clock
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const timeStr = selectedDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-  const dateStr = selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: meta.timezone });
+  const dateStr = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: meta.timezone });
 
   const countryTransit = allTransit.filter((t) => t.country === country);
   const searchLower = search.toLowerCase();

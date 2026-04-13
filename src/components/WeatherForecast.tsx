@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { X, Cloud, Sun, CloudRain, CloudSnow, CloudLightning, CloudDrizzle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { useCountry } from "@/lib/CountryContext";
+import { useI18n } from "@/lib/i18n";
 
 interface DayWeather {
   date: string;
@@ -39,14 +41,13 @@ interface Props {
 }
 
 const WeatherForecast = ({ onClose }: Props) => {
-  const { t } = useI18n();
+  const { meta } = useCountry();
   const [days, setDays] = useState<DayWeather[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchWeather = async () => {
       try {
-        // Singapore coordinates, past 5 + next 5 days
         const today = new Date();
         const past5 = new Date(today);
         past5.setDate(today.getDate() - 5);
@@ -56,9 +57,8 @@ const WeatherForecast = ({ onClose }: Props) => {
         const startDate = past5.toISOString().split("T")[0];
         const endDate = future5.toISOString().split("T")[0];
 
-        // Use forecast for future, and we approximate past with forecast API
         const res = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=1.3521&longitude=103.8198&daily=temperature_2m_max,temperature_2m_min,weather_code&start_date=${startDate}&end_date=${endDate}&timezone=Asia/Singapore`
+          `https://api.open-meteo.com/v1/forecast?latitude=${meta.lat}&longitude=${meta.lon}&daily=temperature_2m_max,temperature_2m_min,weather_code&start_date=${startDate}&end_date=${endDate}&timezone=${encodeURIComponent(meta.timezone)}`
         );
         const data = await res.json();
         
