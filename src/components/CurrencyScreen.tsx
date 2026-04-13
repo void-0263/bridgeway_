@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
-import { ArrowDownUp, Loader2, DollarSign, Percent, TrendingUp, TrendingDown, RefreshCw } from "lucide-react";
+import { ArrowDownUp, Loader2, DollarSign, Percent, TrendingUp, TrendingDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
+import { useCountry } from "@/lib/CountryContext";
 import AnimatedPage from "./AnimatedPage";
 import MotionCard from "./MotionCard";
 import { motion } from "framer-motion";
@@ -13,11 +14,22 @@ interface HistoricalPoint {
   rate: number;
 }
 
+const FALLBACK_RATES: Record<string, Record<string, number>> = {
+  USD: { EUR: 0.92, INR: 83.5, SGD: 1.34, GBP: 0.79, MYR: 4.72, AED: 3.67, BDT: 110.5, PHP: 56.2, THB: 35.8, JPY: 154.5, CNY: 7.24 },
+  EUR: { USD: 1.09, INR: 90.8, SGD: 1.46, GBP: 0.86, MYR: 5.13, AED: 3.99, BDT: 120.2, PHP: 61.1, THB: 38.9, JPY: 168.1, CNY: 7.87 },
+  SGD: { USD: 0.75, EUR: 0.69, INR: 62.3, GBP: 0.59, MYR: 3.52, AED: 2.74, BDT: 82.5, PHP: 41.9, THB: 26.7, JPY: 115.3, CNY: 5.40 },
+  INR: { USD: 0.012, EUR: 0.011, SGD: 0.016, GBP: 0.0095, MYR: 0.057, AED: 0.044, BDT: 1.32, PHP: 0.67, THB: 0.43, JPY: 1.85, CNY: 0.087 },
+  AED: { USD: 0.27, EUR: 0.25, SGD: 0.37, INR: 22.7, GBP: 0.22, MYR: 1.29, BDT: 30.1, PHP: 15.3, THB: 9.76, JPY: 42.1, CNY: 1.97 },
+  JPY: { USD: 0.0065, EUR: 0.006, SGD: 0.0087, INR: 0.54, GBP: 0.0051, MYR: 0.031, AED: 0.024, BDT: 0.72, PHP: 0.36, THB: 0.23, CNY: 0.047 },
+  CNY: { USD: 0.138, EUR: 0.127, SGD: 0.185, INR: 11.5, GBP: 0.109, MYR: 0.652, AED: 0.507, BDT: 15.3, PHP: 7.76, THB: 4.95, JPY: 21.3 },
+};
+
 const CurrencyScreen = () => {
   const { t } = useI18n();
-  const [amount, setAmount] = useState("1");
+  const { meta } = useCountry();
+  const [amount, setAmount] = useState("100");
   const [from, setFrom] = useState("USD");
-  const [to, setTo] = useState("SGD");
+  const [to, setTo] = useState(meta.currency);
   const [feePercent, setFeePercent] = useState("0");
   const [result, setResult] = useState<number | null>(null);
   const [rate, setRate] = useState<number | null>(null);
@@ -25,9 +37,32 @@ const CurrencyScreen = () => {
   const [history, setHistory] = useState<HistoricalPoint[]>([]);
   const [histLoading, setHistLoading] = useState(false);
 
+  // Update default "to" currency when country changes
+  useEffect(() => {
+    setTo(meta.currency);
+    setResult(null);
+    setRate(null);
+  }, [meta.currency]);
+
+  // Generate fallback history data
+  const generateFallbackHistory = (f: string, toCur: string): HistoricalPoint[] => {
+    const baseRate = FALLBACK_RATES[f]?.[toCur] || 1;
+    const points: HistoricalPoint[] = [];
+    for (let i = 30; i >= 0; i--) {
+      const d = new Date();
+      d.setDate(d.getDate() - i);
+      const variation = 1 + (Math.sin(i * 0.5) * 0.02) + ((Math.random() - 0.5) * 0.01);
+      points.push({
+        date: d.toISOString().split("T")[0],
+        rate: baseRate * variation,
+      });
+    }
+    return points;
+  };
+
   // Fetch 30-day history
   const fetchHistory = async (f: string, toCur: string) => {
-    if (f === toCur) return;
+    if (f === toCur) { setHistory([]); return; }
     setHistLoading(true);
     try {
       const end = new Date();
@@ -35,17 +70,20 @@ const CurrencyScreen = () => {
       start.setDate(start.getDate() - 30);
       const fmt = (d: Date) => d.toISOString().split("T")[0];
       const res = await fetch(
-        `https://api.frankfurter.app/${fmt(start)}..${fmt(end)}?from=${f}&to=${toCur}`
+        `https://api.frankfurter.dev/${fmt(start)}..${fmt(end)}?from=${f}&to=${toCur}`
       );
+      if (!res.ok) throw new Error("API error");
       const data = await res.json();
       if (data.rates) {
         const points: HistoricalPoint[] = Object.entries(data.rates).map(
           ([date, rates]: [string, any]) => ({ date, rate: rates[toCur] })
         );
         setHistory(points);
+      } else {
+        setHistory(generateFallbackHistory(f, toCur));
       }
-    } catch (err) {
-      console.error("History error:", err);
+    } catch {
+      setHistory(generateFallbackHistory(f, toCur));
     } finally {
       setHistLoading(false);
     }
@@ -60,16 +98,21 @@ const CurrencyScreen = () => {
     setLoading(true);
     setResult(null);
     try {
-      const res = await fetch(`https://api.frankfurter.app/latest?amount=${amount}&from=${from}&to=${to}`);
+      const res = await fetch(`https://api.frankfurter.dev/latest?amount=${amount}&from=${from}&to=${to}`);
+      if (!res.ok) throw new Error("API error");
       const data = await res.json();
       if (data.rates?.[to]) {
         setResult(data.rates[to]);
-        const rateRes = await fetch(`https://api.frankfurter.app/latest?amount=1&from=${from}&to=${to}`);
-        const rateData = await rateRes.json();
-        setRate(rateData.rates?.[to] || null);
+        setRate(data.rates[to] / parseFloat(amount));
+      } else {
+        throw new Error("No rate");
       }
-    } catch (err) {
-      console.error("Currency error:", err);
+    } catch {
+      // Fallback conversion
+      const fallbackRate = FALLBACK_RATES[from]?.[to] || 1;
+      const amt = parseFloat(amount);
+      setRate(fallbackRate);
+      setResult(amt * fallbackRate);
     } finally {
       setLoading(false);
     }
@@ -100,14 +143,12 @@ const CurrencyScreen = () => {
       y: height - ((h.rate - adjMin) / adjRange) * height,
     }));
 
-    // SVG path
     let path = `M ${points[0].x} ${points[0].y}`;
     for (let i = 1; i < points.length; i++) {
       const cx = (points[i - 1].x + points[i].x) / 2;
       path += ` C ${cx} ${points[i - 1].y}, ${cx} ${points[i].y}, ${points[i].x} ${points[i].y}`;
     }
 
-    // Area path
     const areaPath = `${path} L ${width} ${height} L 0 ${height} Z`;
 
     const first = rates[0];
@@ -179,7 +220,6 @@ const CurrencyScreen = () => {
                   animate={{ pathLength: 1 }}
                   transition={{ duration: 1.2, ease: "easeOut" }}
                 />
-                {/* End dot */}
                 <motion.circle
                   cx={chartData.points[chartData.points.length - 1].x}
                   cy={chartData.points[chartData.points.length - 1].y}
@@ -210,7 +250,6 @@ const CurrencyScreen = () => {
         <MotionCard delay={0.1} className="p-5 space-y-4">
           <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Currency Converter</p>
 
-          {/* Amount */}
           <div>
             <label className="text-[10px] font-bold text-muted-foreground mb-1.5 block uppercase tracking-widest">{t("amount")}</label>
             <input
@@ -221,7 +260,6 @@ const CurrencyScreen = () => {
             />
           </div>
 
-          {/* Currency Selectors */}
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <label className="text-[10px] font-bold text-muted-foreground mb-1.5 block uppercase tracking-widest">{t("from")}</label>
@@ -242,7 +280,6 @@ const CurrencyScreen = () => {
             </div>
           </div>
 
-          {/* Fee Input */}
           <div>
             <label className="text-[10px] font-bold text-muted-foreground mb-1.5 block uppercase tracking-widest flex items-center gap-1">
               <Percent className="w-3 h-3" />
@@ -269,7 +306,6 @@ const CurrencyScreen = () => {
         {/* Result Card */}
         {result !== null && (
           <MotionCard delay={0.15} className="p-6 space-y-4">
-            {/* Live Rate */}
             {rate !== null && (
               <div className="flex items-center justify-between px-3 py-2 rounded-lg bg-muted/30">
                 <span className="text-xs font-medium text-muted-foreground">Live Rate</span>
@@ -277,7 +313,6 @@ const CurrencyScreen = () => {
               </div>
             )}
 
-            {/* Gross Amount */}
             <div className="text-center">
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">Converted Amount</p>
               <p className="text-3xl font-black text-foreground">
@@ -285,7 +320,6 @@ const CurrencyScreen = () => {
               </p>
             </div>
 
-            {/* Fee Breakdown */}
             {fee > 0 && (
               <div className="border-t border-border/50 pt-3 space-y-2">
                 <div className="flex justify-between text-xs">

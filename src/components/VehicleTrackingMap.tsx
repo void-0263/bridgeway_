@@ -18,7 +18,7 @@ const VehicleTrackingMap = ({ vehicleKey, onClose }: Props) => {
 
   useEffect(() => {
     if (!vehicle) return;
-    const totalDuration = 20000;
+    const totalDuration = 120000; // 2 minutes for full journey - much slower and realistic
     const startTime = Date.now();
     const numStops = vehicle.stops.length;
 

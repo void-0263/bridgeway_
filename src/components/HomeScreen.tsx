@@ -21,7 +21,7 @@ const formatTime12h = (time24: string): string => {
 
 const HomeScreen = () => {
   const { t, lang, setLang } = useI18n();
-  const { country, setCountry, countryLabel } = useCountry();
+  const { country, setCountry, countryLabel, meta } = useCountry();
   const [trackingKey, setTrackingKey] = useState<string | null>(null);
   const [showWeather, setShowWeather] = useState(false);
   const [showLangMenu, setShowLangMenu] = useState(false);
@@ -31,11 +31,13 @@ const HomeScreen = () => {
   const [currentTemp, setCurrentTemp] = useState<number | null>(null);
   const [currentWeatherCode, setCurrentWeatherCode] = useState<number>(2);
 
+  
+
   useEffect(() => {
     const fetchCurrentWeather = async () => {
       try {
         const res = await fetch(
-          "https://api.open-meteo.com/v1/forecast?latitude=1.3521&longitude=103.8198&current=temperature_2m,weather_code&timezone=Asia/Singapore"
+          `https://api.open-meteo.com/v1/forecast?latitude=${meta.lat}&longitude=${meta.lon}&current=temperature_2m,weather_code&timezone=${encodeURIComponent(meta.timezone)}`
         );
         const data = await res.json();
         if (data.current) {
@@ -47,10 +49,17 @@ const HomeScreen = () => {
       }
     };
     fetchCurrentWeather();
+  }, [meta]);
+
+  // Country-specific live clock
+  const [now, setNow] = useState(new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(interval);
   }, []);
 
-  const timeStr = selectedDate.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
-  const dateStr = selectedDate.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+  const timeStr = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", timeZone: meta.timezone });
+  const dateStr = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: meta.timezone });
 
   const countryTransit = allTransit.filter((t) => t.country === country);
   const searchLower = search.toLowerCase();
@@ -93,7 +102,7 @@ const HomeScreen = () => {
             <div className="flex-1 pr-3">
               <div className="flex items-center gap-1.5 mb-2">
                 <Sparkles className="w-4 h-4 opacity-80" />
-                <span className="text-[10px] font-semibold opacity-70 uppercase tracking-widest">Community Hub</span>
+                <span className="text-[10px] font-semibold opacity-70 uppercase tracking-widest">Bridgeway</span>
               </div>
               <h1 className="text-2xl font-black leading-tight tracking-tight">{t("welcome")}</h1>
               <p className="text-sm opacity-85 mt-2 leading-snug font-medium">{t("welcomeSub")}</p>

@@ -1,6 +1,6 @@
 {
-  "name": "Community Hub - Travel Companion",
-  "short_name": "Community Hub",
+  "name": "Bridgeway - Travel Companion",
+  "short_name": "Bridgeway",
   "description": "Your travel companion with transit tracking, translation, currency and weather",
   "start_url": "/",
   "display": "standalone",
