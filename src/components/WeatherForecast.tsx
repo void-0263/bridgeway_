@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { X, Cloud, Sun, CloudRain, CloudSnow, CloudLightning, CloudDrizzle } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { useCountry } from "@/lib/CountryContext";
-import { useI18n } from "@/lib/i18n";
 
 interface DayWeather {
   date: string;
