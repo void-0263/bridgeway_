@@ -93,7 +93,7 @@ const HomeScreen = () => {
             <div className="flex-1 pr-3">
               <div className="flex items-center gap-1.5 mb-2">
                 <Sparkles className="w-4 h-4 opacity-80" />
-                <span className="text-[10px] font-semibold opacity-70 uppercase tracking-widest">Community Hub</span>
+                <span className="text-[10px] font-semibold opacity-70 uppercase tracking-widest">Bridgeway</span>
               </div>
               <h1 className="text-2xl font-black leading-tight tracking-tight">{t("welcome")}</h1>
               <p className="text-sm opacity-85 mt-2 leading-snug font-medium">{t("welcomeSub")}</p>
